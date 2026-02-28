@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from uuid import uuid4
 from datetime import datetime
-from app.models import OrderRequest
-from app.servicebus import ServiceBusPublisher
+from models import OrderRequest
+from servicebus import ServiceBusPublisher
 
 app = FastAPI(title="Order API")
 
