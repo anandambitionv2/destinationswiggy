@@ -18,7 +18,8 @@ parameters:
 variables:
   tag: $(Build.BuildId)
   imageName: ${{ parameters.tier }}
-  dockerFilePath: ${{ parameters.tier }}/Dockerfile
+  # dockerFilePath: ${{ parameters.tier }}/Dockerfile
+  dockerFilePath: ./Dockerfile
   buildContext: ./${{ parameters.tier }}
 
 jobs:
