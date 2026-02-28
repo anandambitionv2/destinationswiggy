@@ -37,7 +37,7 @@ jobs:
 
       - script: |
           echo "Building Docker image..."
-          # docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
+          
           docker build -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
         displayName: 'Build Docker Image'
 
@@ -53,3 +53,5 @@ jobs:
           docker tag ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) ${{ parameters.acrname }}.azurecr.io/$(imageName):latest
           docker push ${{ parameters.acrname }}.azurecr.io/$(imageName):latest
         displayName: 'Tag and Push Latest'
+
+        # docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
