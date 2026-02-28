@@ -20,7 +20,8 @@ variables:
   imageName: ${{ parameters.tier }}
   # dockerFilePath: ${{ parameters.tier }}/Dockerfile
   dockerFilePath: ./Dockerfile
-  buildContext: ./${{ parameters.tier }}
+  # buildContext: ./${{ parameters.tier }}
+  buildContext: $(Build.SourcesDirectory)
 
 jobs:
   - job: buildAndPush
@@ -38,7 +39,7 @@ jobs:
       - script: |
           echo "Building Docker image..."
           
-          docker build -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
+          docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
         displayName: 'Build Docker Image'
 
       - script: docker images
