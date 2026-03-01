@@ -14,6 +14,7 @@ parameters:
     values:
       - frontend
       - backend
+      - worker
   - name: dockerFilePath
     type: string
     default: './Dockerfile'
