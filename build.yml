@@ -23,7 +23,7 @@ variables:
   imageName: ${{ parameters.tier }}
   # dockerFilePath: ${{ parameters.tier }}/Dockerfile
   # dockerFilePath: ./Dockerfile
-  dockerFilePath: {{parameters.dockerFilePath}}
+  dockerFilePath: ${{parameters.dockerFilePath}}
   # buildContext: ./${{ parameters.tier }}
   buildContext: $(Build.SourcesDirectory)
 
