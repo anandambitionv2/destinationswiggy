@@ -12,10 +12,9 @@ RUN apt-get update && \
     ACCEPT_EULA=Y apt-get install -y msodbcsql18 && \
     rm -rf /var/lib/apt/lists/*
 
-COPY workerrequirements.txt .
+COPY worker/requirements.txt .
 
-RUN pip install --no-cache-dir -r workerrequirements.txt
-
+RUN pip install --no-cache-dir -r requirements.txt
 COPY worker .
 
 CMD ["python", "worker.py"]
