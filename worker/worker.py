@@ -1,24 +1,43 @@
 import json
-import time
+import pyodbc
 from azure.servicebus import ServiceBusClient
 from config import settings
 
 
+def get_sql_connection():
+    """
+    Connect to Azure SQL using full connection string.
+    Managed Identity handled automatically by ODBC driver.
+    """
+    return pyodbc.connect(settings.sql_connection_string)
+
+
+def save_to_db(order):
+    conn = get_sql_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO Orders (OrderId, CustomerId, CreatedAt)
+        VALUES (?, ?, ?)
+        """,
+        order["orderId"],
+        order["customerId"],
+        order["createdAt"]
+    )
+
+    conn.commit()
+    conn.close()
+
+
 def process_order(message_body: str):
-    """
-    Simulate order processing.
-    Later we will insert into DB here.
-    """
     order = json.loads(message_body)
 
-    print("Processing Order:", order["orderId"])
-    print("Customer:", order["customerId"])
-    print("Items:", order["items"])
+    print(f"Processing Order: {order['orderId']}")
 
-    # Simulate processing time
-    time.sleep(2)
+    save_to_db(order)
 
-    print("Order processed successfully\n")
+    print("Order saved to Azure SQL successfully.\n")
 
 
 def main():
@@ -41,8 +60,6 @@ def main():
                 for message in messages:
                     try:
                         process_order(str(message))
-
-                        # Mark message as completed (removed from queue)
                         receiver.complete_message(message)
 
                     except Exception as e:
