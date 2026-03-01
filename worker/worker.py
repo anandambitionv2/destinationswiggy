@@ -1,15 +1,31 @@
 import json
+import struct
 import pyodbc
+from azure.identity import DefaultAzureCredential
 from azure.servicebus import ServiceBusClient
 from config import settings
 
 
 def get_sql_connection():
     """
-    Connect to Azure SQL using full connection string.
-    Managed Identity handled automatically by ODBC driver.
+    Acquire Azure AD token using DefaultAzureCredential
+    and connect to Azure SQL using token-based authentication.
     """
-    return pyodbc.connect(settings.sql_connection_string)
+
+    credential = DefaultAzureCredential()
+
+    print("Acquiring access token for Azure SQL...")
+    token = credential.get_token("https://database.windows.net/.default")
+
+    token_bytes = token.token.encode("utf-16-le")
+    token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
+
+    conn = pyodbc.connect(
+        settings.sql_connection_string,
+        attrs_before={1256: token_struct}
+    )
+
+    return conn
 
 
 def save_to_db(order):
