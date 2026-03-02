@@ -1,31 +1,11 @@
 import json
-import struct
 import pyodbc
-from azure.identity import DefaultAzureCredential
 from azure.servicebus import ServiceBusClient
 from config import settings
 
 
 def get_sql_connection():
-    """
-    Acquire Azure AD token using DefaultAzureCredential
-    and connect to Azure SQL using token-based authentication.
-    """
-
-    credential = DefaultAzureCredential()
-
-    print("Acquiring access token for Azure SQL...")
-    token = credential.get_token("https://database.windows.net/.default")
-
-    token_bytes = token.token.encode("utf-16-le")
-    token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
-
-    conn = pyodbc.connect(
-        settings.sql_connection_string,
-        attrs_before={1256: token_struct}
-    )
-
-    return conn
+    return pyodbc.connect(settings.sql_connection_string)
 
 
 def save_to_db(order):
@@ -48,12 +28,9 @@ def save_to_db(order):
 
 def process_order(message_body: str):
     order = json.loads(message_body)
-
     print(f"Processing Order: {order['orderId']}")
-
     save_to_db(order)
-
-    print("Order saved to Azure SQL successfully.\n")
+    print("Order saved successfully.\n")
 
 
 def main():
@@ -61,7 +38,7 @@ def main():
         settings.service_bus_connection_string
     )
 
-    print("Worker started. Listening to queue...")
+    print("Worker started...")
 
     with client:
         receiver = client.get_queue_receiver(
@@ -77,9 +54,8 @@ def main():
                     try:
                         process_order(str(message))
                         receiver.complete_message(message)
-
                     except Exception as e:
-                        print("Error processing message:", e)
+                        print("Error:", e)
                         receiver.abandon_message(message)
 
 
