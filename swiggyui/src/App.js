@@ -4,24 +4,24 @@ import "./App.css";
 const restaurants = [
   {
     id: 1,
-    name: "Spicy Hub",
+    name: "Biriyani House",
     rating: "4.5",
     time: "30 mins",
-    image: "https://source.unsplash.com/600x400/?biryani"
+    image: "https://images.unsplash.com/photo-1604908554007-8a0b33d4f19f?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 2,
     name: "Burger World",
     rating: "4.2",
     time: "25 mins",
-    image: "https://source.unsplash.com/600x400/?burger"
+    image: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 3,
     name: "Pizza Corner",
     rating: "4.7",
     time: "20 mins",
-    image: "https://source.unsplash.com/600x400/?pizza"
+    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
