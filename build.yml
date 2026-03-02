@@ -60,4 +60,4 @@ jobs:
           docker push ${{ parameters.acrname }}.azurecr.io/$(imageName):latest
         displayName: 'Tag and Push Latest'
 
-        # docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
+        # docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)t
