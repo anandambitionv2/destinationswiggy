@@ -62,5 +62,5 @@ def health():
 @app.post("/orders", status_code=202)
 def create_order(order: Order):
     logger.info(f"Received order: {order.orderId}")
-    publisher.send_message(order.dict())
+    publisher.publish(order.dict())
     return {"message": "Order accepted"}
