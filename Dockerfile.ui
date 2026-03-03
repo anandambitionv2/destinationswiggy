@@ -1,20 +1,25 @@
 # Build Stage
 FROM node:18-alpine AS build
 
+# Define the argument (defaults to localhost if not provided)
+ARG REACT_APP_API_URL=http://20.108.239.206
+# Set it as an environment variable for the build process
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 WORKDIR /app
 
 COPY swiggyui/package*.json ./
 RUN npm install
 
 COPY swiggyui .
+
+# React's build script will now embed the value of $REACT_APP_API_URL
 RUN npm run build
 
 
 # Production Stage
 FROM nginx:alpine
-
 COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
