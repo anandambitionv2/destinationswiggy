@@ -22,7 +22,7 @@ app = FastAPI(title="Order API")
 ALLOWED_ORIGINS = [
     "http://localhost:3000",              # local dev
     "http://20.26.2.68",
-    "http://85.210.176.38"         # AKS LoadBalancer
+    "http://85.210.176.38",        # AKS LoadBalancer
     "https://yourdomain.com"              # production domain (if using ingress)
 ]
 
