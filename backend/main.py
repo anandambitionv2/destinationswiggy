@@ -21,7 +21,7 @@ app = FastAPI(title="Order API")
 # Replace with your frontend URL
 ALLOWED_ORIGINS = [
     "http://localhost:3000",              # local dev
-    "http://20.26.2.68/",          # AKS LoadBalancer
+    "http://20.26.2.68",          # AKS LoadBalancer
     "https://yourdomain.com"              # production domain (if using ingress)
 ]
 
