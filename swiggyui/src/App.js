@@ -42,11 +42,10 @@ function App() {
     setOrderStatus(restaurant.id); // Track which card is "loading"
     
     const orderPayload = {
-      orderId: `SW-${Date.now()}`,
-      restaurantId: restaurant.id,
-      items: ["Standard Meal"],
-      timestamp: new Date().toISOString()
-    };
+  orderId: `SW-${Date.now()}`,
+  customerId: "customer-1",   // REQUIRED by backend
+  createdAt: new Date().toISOString()
+};
 
     try {
       // Real API Call
