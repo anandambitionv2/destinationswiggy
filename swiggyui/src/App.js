@@ -99,7 +99,7 @@ function App() {
 
       if (!response.ok) throw new Error("Order failed");
 
-      setToast("🚀 Order placed successfully!");
+      setToast(" Order placed successfully!");
 
     } catch (err) {
 
