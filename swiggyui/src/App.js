@@ -1,54 +1,96 @@
+
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-// Use an environment variable or a fallback for the API URL
-const API_URL = process.env.REACT_APP_API_URL || "https://api.example.com";
+// API URL
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 function App() {
+
   const [restaurants, setRestaurants] = useState([]);
+  const [menu, setMenu] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+
   const [loading, setLoading] = useState(true);
-  const [orderStatus, setOrderStatus] = useState(null); // 'idle', 'placing', 'success'
+  const [orderStatus, setOrderStatus] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [toast, setToast] = useState("");
 
-  // 1. THE DATA FETCH: Simulating an API call on component mount
+  // -------------------------
+  // Fetch Restaurants
+  // -------------------------
   useEffect(() => {
+
     const fetchRestaurants = async () => {
+
       try {
+
         setLoading(true);
-        // In a real app: const res = await fetch(`${API_URL}/restaurants`);
-        // Simulating network latency for that "high-end" loading feel
-        await new Promise(resolve => setTimeout(resolve, 1500)); 
-        
-        const mockData = [
-          { id: 1, name: "The Gourmet Kitchen", rating: "4.8", time: "25 mins", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80" },
-          { id: 2, name: "Artisan Burgers", rating: "4.5", time: "20 mins", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80" },
-          { id: 3, name: "Sushi Zen", rating: "4.9", time: "35 mins", image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80" }
-        ];
-        
-        setRestaurants(mockData);
+
+        const res = await fetch(`${API_URL}/restaurants`);
+
+        const data = await res.json();
+
+        setRestaurants(data);
+
       } catch (error) {
-        console.error("Failed to fetch:", error);
+
+        console.error("Failed to fetch restaurants:", error);
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
     fetchRestaurants();
+
   }, []);
 
-  // 2. THE POST CALL: Sending order data to the server
-  const placeOrder = async (restaurant) => {
-    setOrderStatus(restaurant.id); // Track which card is "loading"
-    
-    const orderPayload = {
-  orderId: `SW-${Date.now()}`,
-  customerId: "customer-1",   // REQUIRED by backend
-  createdAt: new Date().toISOString()
-};
+  // -------------------------
+  // Open Restaurant Menu
+  // -------------------------
+  const openRestaurant = async (restaurant) => {
+
+    setSelectedRestaurant(restaurant);
 
     try {
-      // Real API Call
+
+      const res = await fetch(
+        `${API_URL}/restaurants/${restaurant.id}/menu`
+      );
+
+      const data = await res.json();
+
+      setMenu(data);
+
+    } catch (err) {
+
+      console.error("Failed to fetch menu", err);
+
+    }
+
+  };
+
+  // -------------------------
+  // Place Order
+  // -------------------------
+  const placeOrder = async (restaurantId, itemId) => {
+
+    setOrderStatus(itemId);
+
+    const orderPayload = {
+      orderId: `SW-${Date.now()}`,
+      customerId: "customer-1",
+      restaurantId: restaurantId,
+      itemId: itemId,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+
       const response = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,75 +99,170 @@ function App() {
 
       if (!response.ok) throw new Error("Order failed");
 
-      setToast(`🚀 Order confirmed at ${restaurant.name}!`);
+      setToast("🚀 Order placed successfully!");
+
     } catch (err) {
-      // Fallback for demo purposes if API doesn't exist yet
-      setToast(`Mock Success: Order sent to ${restaurant.name}`);
+
+      setToast("❌ Order failed");
+
     } finally {
+
       setOrderStatus(null);
+
       setTimeout(() => setToast(""), 4000);
+
     }
+
   };
 
   return (
+
     <div className={`app ${darkMode ? 'dark' : ''}`}>
+
       <div className="bg-blob"></div>
-      
+
       {/* NAVBAR */}
+
       <nav className="navbar">
-        <div className="logo">SWIGGY<span className="accent">ULTRA</span></div>
-        <div className="nav-links">
-          <button className="mode-toggle" onClick={() => setDarkMode(!darkMode)}>
-            {darkMode ? "☀️ Light" : "🌙 Dark"}
-          </button>
+
+        <div className="logo">
+          SWIGGY<span className="accent">ULTRA</span>
         </div>
+
+        <button
+          className="mode-toggle"
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? "☀️ Light" : "🌙 Dark"}
+        </button>
+
       </nav>
 
       {/* HERO */}
+
       <header className="hero">
-        <h1>Premium Dining, <br/>Delivered.</h1>
+
+        <h1>
+          Premium Dining,
+          <br />
+          Delivered.
+        </h1>
+
         <div className="search-container">
-          <input className="search" placeholder="Search your cravings..." />
+          <input
+            className="search"
+            placeholder="Search your cravings..."
+          />
         </div>
+
       </header>
 
-      {/* CONTENT */}
+      {/* RESTAURANTS */}
+
       <section className="restaurant-section">
+
         {loading ? (
+
           <div className="loading-state">
             <div className="shimmer-card"></div>
             <div className="shimmer-card"></div>
             <div className="shimmer-card"></div>
           </div>
+
         ) : (
+
           <div className="container">
+
             {restaurants.map((r) => (
-              <div key={r.id} className="card">
+
+              <div
+                key={r.id}
+                className="card"
+                onClick={() => openRestaurant(r)}
+              >
+
                 <div className="image-container">
+
                   <img src={r.image} alt={r.name} />
+
                 </div>
+
                 <div className="card-content">
+
                   <div className="card-header">
+
                     <h3>{r.name}</h3>
-                    <span className="rating-tag">★ {r.rating}</span>
+
+                    <span className="rating-tag">
+                      ★ {r.rating}
+                    </span>
+
                   </div>
-                  <button 
-                    className={`order-btn ${orderStatus === r.id ? 'loading' : ''}`}
-                    onClick={() => placeOrder(r)}
-                    disabled={orderStatus !== null}
-                  >
-                    {orderStatus === r.id ? "Processing..." : "Order Now"}
-                  </button>
+
+                  <p>{r.time}</p>
+
                 </div>
+
               </div>
+
             ))}
+
           </div>
+
         )}
+
       </section>
 
+      {/* MENU PANEL */}
+
+      {selectedRestaurant && (
+
+        <div className="menu-panel">
+
+          <h2>{selectedRestaurant.name} Menu</h2>
+
+          {menu.map((item) => (
+
+            <div key={item.id} className="menu-item">
+
+              <span>{item.name}</span>
+
+              <span>₹{item.price}</span>
+
+              <button
+                className={`order-btn ${orderStatus === item.id ? 'loading' : ''}`}
+                onClick={() =>
+                  placeOrder(selectedRestaurant.id, item.id)
+                }
+              >
+                {orderStatus === item.id
+                  ? "Processing..."
+                  : "Order"}
+              </button>
+
+            </div>
+
+          ))}
+
+          <button
+            className="close-menu"
+            onClick={() => setSelectedRestaurant(null)}
+          >
+            Close
+          </button>
+
+        </div>
+
+      )}
+
+      {/* TOAST MESSAGE */}
+
       {toast && <div className="toast">{toast}</div>}
+
     </div>
+
   );
+
 }
 
 export default App;
