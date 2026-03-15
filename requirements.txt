@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-azure-servicebus
-azure-identity
-pydantic
-pydantic-settings
-pyodbc
