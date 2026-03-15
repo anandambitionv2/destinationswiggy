@@ -1,0 +1,5 @@
+azure-servicebus==7.12.1
+pydantic==2.6.1
+pydantic-settings==2.2.1
+pyodbc
+azure-identity
