@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api1
+  namespace: application1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api1
+  template:
+    metadata:
+      labels:
+        app: api1
+    spec:
+      nodeSelector:
+        agentpool: agentpool  # <-- This targets the specific node pool
+      containers:
+      - name: c1
+        image: acrswiggy.azurecr.io/backend:latest
+        env:
+          
+          - name: service_bus_queue_name
+            value: "swiggyqueue"
+          - name: service_bus_namespace
+            value: swiggy.servicebus.windows.net
+          - name: SQL_CONNECTION_STRING
+            
+            value: "DRIVER={ODBC Driver 18 for SQL Server};Server=tcp:swiggysql.database.windows.net,1433;Database=swiggyfree;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=60;Authentication=ActiveDirectoryMSI;UID=77c290c7-402b-4c09-9eed-9bb590abae95;"
+        # resources:
+        #   limits:
+        #     cpu: "5m"
+        #     memory: "128Mi"
+        #   requests:
+        #     cpu: "5m"
+        #     memory: "128Mi"
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoapp-svc-ext
+  namespace: application1
+spec:
+  type: ClusterIP
+  # externalTrafficPolicy: Local
+  selector:
+    app: api1
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+

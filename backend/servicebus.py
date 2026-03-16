@@ -1,15 +1,22 @@
 import json
 from azure.servicebus import ServiceBusClient, ServiceBusMessage
+from azure.identity import DefaultAzureCredential
 from config import settings
 
 
 class ServiceBusPublisher:
 
     def __init__(self):
-        self.client = ServiceBusClient.from_connection_string(
-            settings.service_bus_connection_string
+
+        credential = DefaultAzureCredential()
+
+        self.client = ServiceBusClient(
+            fully_qualified_namespace=settings.service_bus_namespace,
+            credential=credential
         )
+
         self.queue_name = settings.service_bus_queue_name
+
 
     def publish(self, message: dict):
 

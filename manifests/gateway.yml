@@ -1,0 +1,54 @@
+# gateway.yml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: frontend-gateway
+  namespace: application1
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - swiggy1.alwayslearn.in
+---
+# virtualservice.yml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: frontend-virtualservice
+  namespace: application1
+spec:
+  hosts:
+  - swiggy1.alwayslearn.in
+  gateways:
+  - frontend-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /orders
+    route:
+    - destination:
+        host: demoapp-svc-ext
+        port:
+          number: 80
+  - match:
+    - uri:
+        prefix: /restaurants
+    route:
+    - destination:
+        host: demoapp-svc-ext
+        port:
+          number: 80
+    
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: swiggyui-svc-ext
+        port:
+          number: 80
