@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swiggyui1
+  namespace: application1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: swiggyui1
+  template:
+    metadata:
+      labels:
+        app: swiggyui1
+    spec:
+      nodeSelector:
+        agentpool: agentpool  # <-- This targets the specific node pool
+      containers:
+      - name: c1
+        image: acrswiggy.azurecr.io/frontend:latest
+        # resources:
+        #   limits:
+        #     cpu: "5m"
+        #     memory: "128Mi"
+        #   requests:
+        #     cpu: "5m"
+        #     memory: "128Mi"
+        
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swiggyui-svc-ext
+  namespace: application1
+spec:
+  type: ClusterIP
+  # externalTrafficPolicy: Local
+  selector:
+    app: swiggyui1
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+

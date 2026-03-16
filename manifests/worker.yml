@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker1
+  namespace: application1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker1
+  template:
+    metadata:
+      labels:
+        app: worker1
+        # azure.workload.identity/use: "true"
+    spec:
+      # serviceAccountName: worker1-sa
+      containers:
+      - name: c1
+        image: acrswiggy.azurecr.io/worker:latest
+        env:
+          - name: service_bus_queue_name
+            value: "swiggyqueue"
+          - name: service_bus_namespace
+            value: swiggy.servicebus.windows.net
+          
+          - name: SQL_CONNECTION_STRING
+            # value: DRIVER={ODBC Driver 18 for SQL Server};Server=tcp:swiggysql.database.windows.net,1433;Database=swiggyfree;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;Authentication=ActiveDirectoryMSI;
+            # value: DRIVER={ODBC Driver 18 for SQL Server};Server=tcp:swiggysql.database.windows.net,1433;Database=swiggyfree;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;
+            value: "DRIVER={ODBC Driver 18 for SQL Server};Server=tcp:swiggysql.database.windows.net,1433;Database=swiggyfree;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=60;Authentication=ActiveDirectoryMSI;UID=77c290c7-402b-4c09-9eed-9bb590abae95;"
+          - name: AZURE_CLIENT_ID
+            value: "b95b5e50-4cad-4e6d-a0f2-a77dedc3fe5f"
+            # value: "77c290c7-402b-4c09-9eed-9bb590abae95"
