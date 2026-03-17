@@ -13,7 +13,7 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - swiggy1.alwayslearn.in
+    - swiggy2.alwayslearn.in
 ---
 # virtualservice.yml
 apiVersion: networking.istio.io/v1beta1
@@ -23,7 +23,7 @@ metadata:
   namespace: application1
 spec:
   hosts:
-  - swiggy1.alwayslearn.in
+  - swiggy2.alwayslearn.in
   gateways:
   - frontend-gateway
   http:
