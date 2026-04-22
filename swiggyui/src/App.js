@@ -126,7 +126,7 @@ function App() {
       <nav className="navbar">
 
         <div className="logo">
-          SWIGGY<span className="accent">ULTRAv333</span>
+          SWIGGY<span className="accent">ULTRAv444</span>
         </div>
 
         <button
