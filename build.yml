@@ -10,23 +10,22 @@ parameters:
     default: academo
   - name: tier
     type: string
-    default: 'backend'
+    default: 'frontend'
     values:
       - frontend
       - backend
       - worker
   - name: dockerFilePath
     type: string
-    default: './Dockerfile'
+    default: './Dockerfile.ui'
 
 variables:
   tag: $(Build.BuildId)
   imageName: ${{ parameters.tier }}
-  # dockerFilePath: ${{ parameters.tier }}/Dockerfile
-  # dockerFilePath: ./Dockerfile
-  dockerFilePath: ${{parameters.dockerFilePath}}
-  # buildContext: ./${{ parameters.tier }}
+  dockerFilePath: ${{ parameters.dockerFilePath }}
   buildContext: $(Build.SourcesDirectory)
+  # Full path to your registry image
+  registryPath: ${{ parameters.acrname }}.azurecr.io/$(imageName)
 
 jobs:
   - job: buildAndPush
@@ -42,22 +41,25 @@ jobs:
             az acr login --name ${{ parameters.acrname }}
 
       - script: |
-          echo "Building Docker image..."
+          echo "Setting up Docker Buildx..."
+          # Create and use a new builder instance (required for cache features)
+          docker buildx create --use --name pipeline-builder
           
-          docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)
-        displayName: 'Build Docker Image'
-
-      - script: docker images
-        displayName: 'Show Docker Images'
+          echo "Building and Pushing image with caching..."
+          # This single command builds, uses cache, tags twice, and pushes to ACR
+          docker buildx build \
+            --cache-from=type=registry,ref=$(registryPath):buildcache \
+            --cache-to=type=registry,ref=$(registryPath):buildcache,mode=max \
+            -f $(dockerFilePath) \
+            -t $(registryPath):$(tag) \
+            -t $(registryPath):latest \
+            --push \
+            $(buildContext)
+        displayName: 'Build and Push with Buildx Cache'
 
       - script: |
-          echo "Pushing image..."
-          docker push ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag)
-        displayName: 'Push Image with Build ID Tag'
-
-      - script: |
-          docker tag ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) ${{ parameters.acrname }}.azurecr.io/$(imageName):latest
-          docker push ${{ parameters.acrname }}.azurecr.io/$(imageName):latest
-        displayName: 'Tag and Push Latest'
-
-        # docker build -f $(dockerFilePath) -t ${{ parameters.acrname }}.azurecr.io/$(imageName):$(tag) $(buildContext)t
+          echo "Build Complete."
+          echo "Image 1: $(registryPath):$(tag)"
+          echo "Image 2: $(registryPath):latest"
+          echo "Cache: $(registryPath):buildcache"
+        displayName: 'Final Summary'
