@@ -1,81 +1,144 @@
 body {
-  background: #0a0a0a;
+  margin: 0;
+  background: #0b0b0b;
   color: white;
-  font-family: sans-serif;
+  font-family: Arial, sans-serif;
 }
 
-/* Glass UI */
-.glass {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  border-radius: 16px;
-}
-
-/* Neon */
-.neon {
-  color: #f59e0b;
-  text-shadow: 0 0 10px #f59e0b;
-}
-
-/* Animated blobs */
-.blob {
-  position: fixed;
-  width: 400px;
-  height: 400px;
-  filter: blur(120px);
-  opacity: 0.4;
-  z-index: -1;
-}
-
-.blob1 {
-  background: purple;
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  position: sticky;
   top: 0;
-  left: 0;
-  animation: float 10s infinite;
+  z-index: 10;
 }
 
-.blob2 {
-  background: orange;
-  bottom: 0;
-  right: 0;
-  animation: float 12s infinite;
+.logo {
+  color: #f59e0b;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(50px); }
-  100% { transform: translateY(0px); }
+.nav-search {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
 }
 
-/* Cards */
-.card {
+/* HERO */
+.hero {
+  position: relative;
+  height: 60vh;
+  background: url("https://images.unsplash.com/photo-1504674900247-0877df9cc836")
+    center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  padding: 40px;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, black, transparent);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 60px;
+  font-weight: 800;
+}
+
+.hero span {
+  color: #f59e0b;
+}
+
+.hero input {
+  margin-top: 20px;
   padding: 10px;
-  margin: 10px;
+  width: 300px;
+  border-radius: 10px;
+  border: none;
+}
+
+/* SECTION */
+.section {
+  padding: 20px;
+}
+
+.scroll-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+}
+
+/* CARD */
+.game-card {
+  min-width: 280px;
+  height: 180px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
   cursor: pointer;
   transition: 0.3s;
 }
 
-/* Menu */
+.game-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.game-card:hover {
+  transform: scale(1.08);
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(transparent, black);
+}
+
+/* MENU PANEL */
 .menu-panel {
   position: fixed;
   right: 0;
   top: 0;
-  height: 100%;
   width: 400px;
+  height: 100%;
+  background: #111;
   padding: 20px;
+  overflow-y: auto;
 }
 
-/* Button */
-.order-btn {
-  background: linear-gradient(45deg, orange, pink);
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.menu-item button {
+  background: orange;
   border: none;
-  padding: 6px 12px;
-  border-radius: 10px;
-  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-/* Toast */
+.close-btn {
+  margin-top: 20px;
+}
+
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 20px;

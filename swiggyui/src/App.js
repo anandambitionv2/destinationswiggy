@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
@@ -8,30 +7,29 @@ function App() {
   const [restaurants, setRestaurants] = useState([]);
   const [menu, setMenu] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [orderStatus, setOrderStatus] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
   const [toast, setToast] = useState("");
 
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        setLoading(true);
         const res = await fetch(`${API_URL}/restaurants`);
         const data = await res.json();
         setRestaurants(data);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchRestaurants();
   }, []);
 
   const openRestaurant = async (restaurant) => {
     setSelectedRestaurant(restaurant);
+
     try {
       const res = await fetch(`${API_URL}/restaurants/${restaurant.id}/menu`);
       const data = await res.json();
@@ -44,19 +42,17 @@ function App() {
   const placeOrder = async (restaurantId, itemId) => {
     setOrderStatus(itemId);
 
-    const payload = {
-      orderId: `SW-${Date.now()}`,
-      customerId: "customer-1",
-      restaurantId,
-      itemId,
-      createdAt: new Date().toISOString()
-    };
-
     try {
       const res = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          orderId: `SW-${Date.now()}`,
+          customerId: "customer-1",
+          restaurantId,
+          itemId,
+          createdAt: new Date().toISOString(),
+        }),
       });
 
       if (!res.ok) throw new Error();
@@ -71,113 +67,82 @@ function App() {
   };
 
   return (
-    <div className={`app ${darkMode ? "dark" : ""}`}>
-
-      {/* 🔥 Animated Background */}
-      <div className="blob blob1"></div>
-      <div className="blob blob2"></div>
+    <div className="app">
 
       {/* NAVBAR */}
-      <nav className="navbar glass">
-        <h1 className="logo neon">SWIGGY ULTRA</h1>
-
-        <button onClick={() => setDarkMode(!darkMode)}>
-          {darkMode ? "☀️" : "🌙"}
-        </button>
+      <nav className="navbar">
+        <h1 className="logo">SWIGGY ULTRA</h1>
+        <input className="nav-search" placeholder="Search food..." />
       </nav>
 
       {/* HERO */}
       <header className="hero">
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          Premium Dining <br /> Reimagined ⚡
-        </motion.h1>
-
-        <input className="search" placeholder="Search crazy food..." />
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <h1>
+            Discover <span>Epic Food</span>
+          </h1>
+          <p>Order like a legend ⚡</p>
+          <input placeholder="Search restaurants..." />
+        </div>
       </header>
 
       {/* RESTAURANTS */}
-      <section className="container">
+      <section className="section">
+        <h2>🔥 Top Picks</h2>
 
         {loading ? (
-          <div>Loading...</div>
+          <p>Loading...</p>
         ) : (
-          restaurants.map((r) => (
-            <motion.div
-              key={r.id}
-              className="card glass"
-              whileHover={{
-                scale: 1.05,
-                rotateX: 5,
-                rotateY: -5
-              }}
-              onClick={() => openRestaurant(r)}
-            >
-              <img src={r.image} alt={r.name} />
-
-              <div className="card-content">
-                <h3>{r.name}</h3>
-                <span className="rating">⭐ {r.rating}</span>
+          <div className="scroll-row">
+            {restaurants.map((r) => (
+              <div
+                key={r.id}
+                className="game-card"
+                onClick={() => openRestaurant(r)}
+              >
+                <img src={r.image} alt={r.name} />
+                <div className="overlay">
+                  <h3>{r.name}</h3>
+                  <span>⭐ {r.rating}</span>
+                </div>
               </div>
-            </motion.div>
-          ))
+            ))}
+          </div>
         )}
-
       </section>
 
       {/* MENU PANEL */}
-      <AnimatePresence>
-        {selectedRestaurant && (
-          <motion.div
-            className="menu-panel glass"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-          >
-            <h2>{selectedRestaurant.name}</h2>
+      {selectedRestaurant && (
+        <div className="menu-panel">
+          <h2>{selectedRestaurant.name}</h2>
 
-            {menu.map((item) => (
-              <motion.div
-                key={item.id}
-                className="menu-item"
-                whileHover={{ scale: 1.05 }}
+          {menu.map((item) => (
+            <div key={item.id} className="menu-item">
+              <span>{item.name}</span>
+              <span>₹{item.price}</span>
+
+              <button
+                onClick={() =>
+                  placeOrder(selectedRestaurant.id, item.id)
+                }
               >
-                <span>{item.name}</span>
-                <span>₹{item.price}</span>
+                {orderStatus === item.id ? "⚡" : "Order"}
+              </button>
+            </div>
+          ))}
 
-                <button
-                  className="order-btn"
-                  onClick={() =>
-                    placeOrder(selectedRestaurant.id, item.id)
-                  }
-                >
-                  {orderStatus === item.id ? "⚡" : "Order"}
-                </button>
-              </motion.div>
-            ))}
-
-            <button onClick={() => setSelectedRestaurant(null)}>
-              Close
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <button
+            className="close-btn"
+            onClick={() => setSelectedRestaurant(null)}
+          >
+            Close
+          </button>
+        </div>
+      )}
 
       {/* TOAST */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            className="toast"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-          >
-            {toast}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }
