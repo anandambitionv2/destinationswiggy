@@ -71,7 +71,7 @@ function App() {
 
       {/* NAVBAR */}
       <nav className="navbar">
-        <h1 className="logo">SWIGGY ULTRA V111111</h1>
+        <h1 className="logo">SWIGGY ULTRA V222</h1>
         <input className="nav-search" placeholder="Search food..." />
       </nav>
 
